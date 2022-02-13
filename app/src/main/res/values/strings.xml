@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Android Smart Job Scheduler</string>
+    <string name="demo">Demo</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.bng.androidsmartjobscheduler;
+package com.volgup.androidsmartjobscheduler;
 
 import android.content.Context;
 
