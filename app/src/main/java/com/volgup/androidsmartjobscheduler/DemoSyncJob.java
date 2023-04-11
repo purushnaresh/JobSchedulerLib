@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.volgup.jobschedulerlib.Job;
+import com.volgup.jobschedulerlib.util.PendingIntentManager;
 
 import java.util.Random;
 
@@ -28,7 +29,7 @@ public class DemoSyncJob extends Job {
     protected Result onRunJob(@NonNull final Params params) {
         boolean success = new DemoSyncEngine(getContext()).sync();
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0, new Intent(getContext(), MainActivity.class), 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0, new Intent(getContext(), MainActivity.class), PendingIntentManager.FLAG_UPDATE_CURRENT());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(TAG, "Job Demo", NotificationManager.IMPORTANCE_LOW);

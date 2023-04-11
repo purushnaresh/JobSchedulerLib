@@ -86,15 +86,31 @@ public class JobProxy14 implements JobProxy {
     }
 
     protected void plantOneOffExact(JobRequest request, AlarmManager alarmManager, PendingIntent pendingIntent) {
-        long triggerAtMillis = getTriggerAtMillis(request);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(getType(true), triggerAtMillis, pendingIntent);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            alarmManager.setExact(getType(true), triggerAtMillis, pendingIntent);
-        } else {
-            alarmManager.set(getType(true), triggerAtMillis, pendingIntent);
+        try {
+            long triggerAtMillis = getTriggerAtMillis(request);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    if(alarmManager.canScheduleExactAlarms()){
+                        //set exact alarm while allowed alarm permissions
+                        alarmManager.setExactAndAllowWhileIdle(getType(true), triggerAtMillis, pendingIntent);
+                    }else {
+                        //set through with(not in idle) or without(idle mode) exact to alarm
+                        alarmManager.setAndAllowWhileIdle(getType(true), triggerAtMillis, pendingIntent);
+                    }
+                }else {
+                    /*default allowed alarm permission bellowed S */
+                    alarmManager.setExactAndAllowWhileIdle(getType(true), triggerAtMillis, pendingIntent);
+                }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                alarmManager.setExact(getType(true), triggerAtMillis, pendingIntent);
+            } else {
+                alarmManager.set(getType(true), triggerAtMillis, pendingIntent);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
+            logScheduled(request);
         }
-        logScheduled(request);
     }
 
     protected void plantOneOffFlexSupport(JobRequest request, AlarmManager alarmManager, PendingIntent pendingIntent) {
