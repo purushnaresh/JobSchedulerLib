@@ -101,22 +101,26 @@ import java.util.concurrent.TimeUnit;
      */
     public static ComponentName startWakefulService(Context context, Intent intent) {
         synchronized (ACTIVE_WAKE_LOCKS) {
-            int id = nextId;
-            nextId++;
-            if (nextId <= 0) {
-                nextId = 1;
-            }
+            ComponentName comp = null;
+            try {
+                int id = nextId;
+                nextId++;
+                if (nextId <= 0) {
+                    nextId = 1;
+                }
 
-            intent.putExtra(EXTRA_WAKE_LOCK_ID, id);
-            ComponentName comp = context.startService(intent);
-            if (comp == null) {
-                return null;
-            }
-
-            String tag = "wake:" + comp.flattenToShortString();
-            PowerManager.WakeLock wakeLock = acquireWakeLock(context, tag, TimeUnit.MINUTES.toMillis(3));
-            if (wakeLock != null) {
-                ACTIVE_WAKE_LOCKS.put(id, wakeLock);
+                intent.putExtra(EXTRA_WAKE_LOCK_ID, id);
+                comp = context.startService(intent);
+                if (comp == null) {
+                    return null;
+                }
+                String tag = "wake:" + comp.flattenToShortString();
+                PowerManager.WakeLock wakeLock = acquireWakeLock(context, tag, TimeUnit.MINUTES.toMillis(3));
+                if (wakeLock != null) {
+                    ACTIVE_WAKE_LOCKS.put(id, wakeLock);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             return comp;
